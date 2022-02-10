@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿
+using TrettonCodeTest.Models;
+/// <summary>
 /// Author: Ryan Cockram
 /// 
 /// Code Test for Technical interview re. Tretton37.
@@ -12,7 +14,6 @@
 /// and save it to disk while keeping the integrity of the file structure.
 /// 
 /// </summary>
-
 namespace TrettonCodeTest
 {
     public class Program
@@ -23,6 +24,10 @@ namespace TrettonCodeTest
                 $"This program will recursively download all the pages from https://tretton37.com/ and preserve their paths,\n" +
                 $"saving the Html files on disk\n\n" +
                 $"Hit Enter to begin!");
+
+            Console.ReadLine();
+
+            var rootPage = await new HtmlPage("").GetChildren();
 
             Console.ReadLine();
         }
