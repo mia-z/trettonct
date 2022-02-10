@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace TrettonCodeTest
         /// <summary>
         /// Creates a HashSet containing object IndexType for the purpose of soft-indexing the directories and files
         /// Creates a virtual file structure in memory which can be referenced later when saving files to disk
-        /// Checks against 3 main values to ensure file system integrity similar to that of modern filesystems.
+        /// Checks against 4 main values to ensure file system integrity similar to that of modern filesystems.
         /// - Verifies the parent of the Index - or not if it is null (root)
         /// - Verifies the depth 
         /// - Verifies the name
@@ -101,15 +102,51 @@ namespace TrettonCodeTest
                     }
                 }
             }
-
             return directories;
         }
 
+        /// <summary>
+        /// Helper function for creating the initial root directories
+        /// Checks against the current einvornment if certain directories exist, and if not, creates them.
+        /// </summary>
+        /// <param name="paths">List of System.String paths to create directories for</param>
+        public static void CreateDirectories(List<string> paths)
+        {
+            if (!Directory.Exists(dumpRoot))
+            {
+                Console.WriteLine("Creating non-existant root application folder");
+                Directory.CreateDirectory(dumpRoot);
+            }
+
+            Console.WriteLine($"Creating {paths.Count} folders");
+            foreach (string path in paths)
+            {
+                var thisDirectory = Path.Combine(dumpRoot, path);
+                if (!Directory.Exists(thisDirectory))
+                {
+                    Directory.CreateDirectory(thisDirectory);
+                    Console.WriteLine($"Created {path}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Simple helper function that creates a scope-managed instance of StreamWriter for automatic disposal.
+        /// Also appends files with .html in the event it doesn't exist. 
+        /// </summary>
+        /// <param name="path">The path where the file will be written</param>
+        /// <param name="data">The HTML string of the webpage to be written to file</param>
+        /// <returns></returns>
         public static async Task WriteHtml(string path, string data)
         {
-            var dirPath = Path.Combine("\\", dumpRoot, string.Join("\\", path.Split("/").ToArray()));
 
-            using (StreamWriter sw = new StreamWriter(dirPath))
+            var filePath = Path.Combine(dumpRoot, path);
+            if (!filePath.EndsWith(".html"))
+            {
+                filePath += ".html";
+            }
+
+            using (StreamWriter sw = new StreamWriter(filePath))
             {
                 try
                 {
@@ -117,25 +154,7 @@ namespace TrettonCodeTest
                 }
                 catch (DirectoryNotFoundException dnf)
                 {
-                    var exists = false;
-                    var depthCheck = path.Split("/").Length - 1;
-                    
-                    if (depthCheck < 0) 
-                        throw new Exception("Impossible depth found.");
-                    
-                    while (!exists)
-                    {
-                        var existsPath = Path.Combine("\\", dumpRoot, string.Join("\\", path.Split("/").Take(depthCheck).ToArray()));
-                        if (!Directory.Exists(path) && depthCheck >= 0)
-                        {
-                            Directory.CreateDirectory(existsPath);
-
-                            exists = true;
-                        } else
-                        {
-                            depthCheck--;
-                        }
-                    }
+                    Console.WriteLine("error writing file", dnf);
                 }
             }
         }

@@ -15,12 +15,14 @@ namespace TrettonCodeTest.Services
         private readonly HashSet<string> _pathsFound;
         private int _currentTaskCount;
         private int _totalTaskCount;
+        private int _writeProgress;
 
         private PathMonitor()
         {
             _pathsFound = new HashSet<string>();
             _currentTaskCount = 0;
             _totalTaskCount = 0;
+            _writeProgress = 0;
         }
 
         public static readonly Lazy<PathMonitor> _instance = new Lazy<PathMonitor>(() => new PathMonitor());
@@ -55,27 +57,53 @@ namespace TrettonCodeTest.Services
             return _pathsFound.Contains(path);
         }
 
+        /// <summary>
+        /// Frontend helper function for displaying how many tasks have been executed and how many are current running
+        /// </summary>
+        /// <param name="amount"></param>
         public void IncrementTaskCount(int amount)
         {
             _currentTaskCount += amount;
             _totalTaskCount += amount;
 
-            Console.SetCursorPosition(0, Console.WindowHeight - 3);
+            Console.SetCursorPosition(0, 7);
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
             Console.Write($"Current # of tasks running: {_currentTaskCount}");
 
-            Console.SetCursorPosition(0, Console.WindowHeight - 2);
+            Console.SetCursorPosition(0, 8);
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
             Console.Write($"Total tasks completed: {_totalTaskCount}");
         }
 
+        /// <summary>
+        /// Frontend helper function for decrementing the current amount of running tasks count
+        /// </summary>
         public void DecrementTaskCount()
         {
             _currentTaskCount--;
 
-            Console.SetCursorPosition(0, Console.WindowHeight - 3);
+            Console.SetCursorPosition(0, 7);
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
             Console.Write($"Current # of tasks running: {_currentTaskCount}");
         }
+
+        /// <summary>
+        /// Frontend helper function for displaying the current progress of data write to disk
+        /// </summary>
+        /// <param name="max"></param>
+        public void IncrementWriteProgress(int max)
+        {
+            _writeProgress++;
+            Console.SetCursorPosition(0, 12);
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            Console.Write($"Progress: {(_writeProgress / max) * 100}%");
+        }
+
+        /// <summary>
+        /// Helper function for setting the starting progress of the IncrementWriteProgress total count
+        /// </summary>
+        /// <param name="startingProgress"></param>
+        public void SetWriteProgress(int startingProgress) =>
+            _writeProgress = startingProgress;
     }
 }
