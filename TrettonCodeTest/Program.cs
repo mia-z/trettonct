@@ -1,4 +1,5 @@
 ﻿
+using TrettonCodeTest.Enumerators;
 using TrettonCodeTest.Models;
 /// <summary>
 /// Author: Ryan Cockram
@@ -20,14 +21,26 @@ namespace TrettonCodeTest
     {
         public static async Task Main(string[] args)
         {
+            if (!Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "RCT37CT")))
+            {
+                Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "RCT37CT"));
+            }
+            
             Console.WriteLine($"Welcome to the Code Test for Tretton37 by Ryan Cockram\n" +
                 $"This program will recursively download all the pages from https://tretton37.com/ and preserve their paths,\n" +
                 $"saving the Html files on disk\n\n" +
                 $"Hit Enter to begin!");
 
-            Console.ReadLine();
+            //Console.ReadLine();
 
             var rootPage = await new HtmlPage("").GetChildren();
+
+            var allPaths = rootPage.Children
+                .UnionBy(rootPage.Children.SelectMany(x => x.Children), x => x)
+                .ToHashSet();
+
+            var vfs = Utils.CreateIndicies(allPaths.Select(x => x.Path).ToList());
+            var directories = vfs.Where(x => x.IndexType == IndexType.DIRECTORY).ToList();
 
             Console.ReadLine();
         }

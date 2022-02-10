@@ -12,13 +12,13 @@ namespace TrettonCodeTest.Services
     /// </summary>
     public sealed class PathMonitor
     {
-        private readonly List<string> _pathsFound;
+        private readonly HashSet<string> _pathsFound;
         private int _currentTaskCount;
         private int _totalTaskCount;
 
         private PathMonitor()
         {
-            _pathsFound = new List<string>();
+            _pathsFound = new HashSet<string>();
             _currentTaskCount = 0;
             _totalTaskCount = 0;
         }
@@ -27,7 +27,7 @@ namespace TrettonCodeTest.Services
 
         public static PathMonitor Instance => _instance.Value;
 
-        public List<string> GetFoundPaths()
+        public HashSet<string> GetFoundPaths()
         {
             return _pathsFound;
         }
@@ -46,24 +46,6 @@ namespace TrettonCodeTest.Services
         }
 
         /// <summary>
-        /// Add an array of paths to the list of found paths, via range
-        /// </summary>
-        /// <param name="path">System.String[] containing the multiple values found paths</param>
-        public void AddPaths(string[] paths)
-        {
-            _pathsFound.AddRange(paths);
-        }
-
-        /// <summary>
-        /// Add a list of paths to the list of found paths, via range
-        /// </summary>
-        /// <param name="path">List of System-String containing the multiple values found paths</param>
-        public void AddPaths(List<string> paths)
-        {
-            _pathsFound.AddRange(paths);
-        }
-
-        /// <summary>
         /// Checks to see if a path has already been found
         /// </summary>
         /// <param name="path">The path to check</param>
@@ -77,6 +59,7 @@ namespace TrettonCodeTest.Services
         {
             _currentTaskCount += amount;
             _totalTaskCount += amount;
+
             Console.SetCursorPosition(0, Console.WindowHeight - 3);
             Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
             Console.Write($"Current # of tasks running: {_currentTaskCount}");

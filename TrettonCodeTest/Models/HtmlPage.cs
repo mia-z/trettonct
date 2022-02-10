@@ -9,6 +9,9 @@ using TrettonCodeTest.Services;
 
 namespace TrettonCodeTest.Models
 {
+    /// <summary>
+    /// Class for holding information to an HTML page in the form of a raw string, it's location and asscociated children via found anchor tags
+    /// </summary>
     internal class HtmlPage
     {
         //Hard coded - can probably set via cl-parameter later. or not.🤷‍
@@ -39,7 +42,7 @@ namespace TrettonCodeTest.Models
         /// List of the children under this page.
         /// "children" being any anchor tag found in the HTML that isnt already being tracked by the PathMonitor service
         /// </summary>
-        public List<HtmlPage>? Children { get; private set; }
+        public List<HtmlPage> Children { get; private set; } = new List<HtmlPage>();
 
         public HtmlPage(string path)
         {
@@ -79,8 +82,7 @@ namespace TrettonCodeTest.Models
                 //Update the monitor for the impending recursion!
                 foreach (string path in hrefs)
                 {
-                    if (!PathMonitor.Instance.PathExists(path))
-                        PathMonitor.Instance.AddPath(path);
+                    PathMonitor.Instance.AddPath(path);
                 }
 
                 //If there _are_ any children, we need to recurse and check those children for their children and their children for their children.. I can go on.
