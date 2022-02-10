@@ -88,8 +88,8 @@ namespace TrettonCodeTest.Models
                 {
                     //Prepare a list of tasks for every child we are going to recurse
                     List<Task> childProcesses = new List<Task>();
-
-                    //Loop through the children, calling their get function in parallel with eachother. 
+                    PathMonitor.Instance.IncrementTaskCount(Children.Count);
+                    //Loop through the children, calling their GetChildren function in parallel with eachother. 
                     //(I also tried this synchronously.. I'm still waiting for it to finish)
                     foreach (var child in Children)
                     {
@@ -97,7 +97,13 @@ namespace TrettonCodeTest.Models
                     }
 
                     //Wait until all the children of children(n) have been created 
-                    Task.WaitAll(childProcesses.ToArray());
+                    while (childProcesses.Any())
+                    {
+                        //Simple wait loop which will report progress when a task completes
+                        var finishedSearch = await Task.WhenAny(childProcesses);
+                        childProcesses.Remove(finishedSearch);
+                        PathMonitor.Instance.DecrementTaskCount();
+                    }
                 }
 
                 //Not entirely neccessary, but I like function chaining so I opted for this.

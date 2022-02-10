@@ -13,10 +13,14 @@ namespace TrettonCodeTest.Services
     public sealed class PathMonitor
     {
         private readonly List<string> _pathsFound;
+        private int _currentTaskCount;
+        private int _totalTaskCount;
 
         private PathMonitor()
         {
             _pathsFound = new List<string>();
+            _currentTaskCount = 0;
+            _totalTaskCount = 0;
         }
 
         public static readonly Lazy<PathMonitor> _instance = new Lazy<PathMonitor>(() => new PathMonitor());
@@ -35,6 +39,10 @@ namespace TrettonCodeTest.Services
         public void AddPath(string path)
         {
             _pathsFound.Add(path);
+
+            Console.SetCursorPosition(0, Console.WindowHeight - 1);
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            Console.Write($"Found {_pathsFound.Count} unique pages");
         }
 
         /// <summary>
@@ -63,6 +71,28 @@ namespace TrettonCodeTest.Services
         public bool PathExists(string path)
         {
             return _pathsFound.Contains(path);
+        }
+
+        public void IncrementTaskCount(int amount)
+        {
+            _currentTaskCount += amount;
+            _totalTaskCount += amount;
+            Console.SetCursorPosition(0, Console.WindowHeight - 3);
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            Console.Write($"Current # of tasks running: {_currentTaskCount}");
+
+            Console.SetCursorPosition(0, Console.WindowHeight - 2);
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            Console.Write($"Total tasks completed: {_totalTaskCount}");
+        }
+
+        public void DecrementTaskCount()
+        {
+            _currentTaskCount--;
+
+            Console.SetCursorPosition(0, Console.WindowHeight - 3);
+            Console.Write("\r" + new string(' ', Console.WindowWidth) + "\r");
+            Console.Write($"Current # of tasks running: {_currentTaskCount}");
         }
     }
 }
